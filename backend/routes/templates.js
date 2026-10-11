@@ -6,6 +6,7 @@ const fs = require('fs');
 const { Template } = require('../schemas');
 console.log('Template loaded:', typeof Template, Template?.modelName);
 const { requireAuth, requireAdmin } = require('./auth');
+const { readRules, saveRules, classifySheet } = require('../services/importRules');
 
 const router = express.Router();
 
@@ -48,6 +49,24 @@ router.get('/', requireAuth, async (req, res) => {
   res.json(templates);
 });
 
+router.get('/import-rules', requireAuth, requireAdmin, (req, res) => {
+  res.json(readRules());
+});
+
+router.put('/import-rules', requireAuth, requireAdmin, (req, res) => {
+  try {
+    res.json(saveRules(req.body));
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+router.post('/import/preview', requireAuth, requireAdmin, (req, res) => {
+  const { sheets } = req.body;
+  if (!Array.isArray(sheets)) return res.status(400).json({ message: 'Sheets must be an array' });
+  res.json(sheets.map((sheet) => classifySheet(sheet)));
+});
+
 // GET /templates/:id
 router.get('/:id', requireAuth, async (req, res) => {
   const template = await Template.findById(req.params.id);
@@ -72,7 +91,8 @@ router.post('/import', requireAuth, requireAdmin, async (req, res) => {
     return res.status(400).json({ message: 'Each worksheet needs a name, category, and items list' });
   }
 
-  const templates = await Template.insertMany(sheets.map((sheet) => ({
+  const classifiedSheets = sheets.map((sheet) => classifySheet(sheet));
+  const templates = await Template.insertMany(classifiedSheets.map((sheet) => ({
     name: sheet.name.trim(),
     description: sheet.description || '',
     category: sheet.category,
@@ -83,6 +103,9 @@ router.post('/import', requireAuth, requireAdmin, async (req, res) => {
       description: String(item.description || '').trim(),
       quantity: Math.max(1, Number(item.quantity) || 1),
     })),
+    licences: sheet.runtimeIoPoints > 0 ? { runtime: { ioPoints: sheet.runtimeIoPoints } } : undefined,
+    importedSections: sheet.sections,
+    importedRuntimeIoPoints: sheet.runtimeIoPoints,
     createdBy: req.user?._id ?? null,
   })));
 
@@ -91,7 +114,7 @@ router.post('/import', requireAuth, requireAdmin, async (req, res) => {
 
 // POST /templates — admin only
 router.post('/', requireAuth, requireAdmin, upload.single('image'), async (req, res) => {
-  const { name, description, category, sourceType, items, SelectedHw, Hmi_id, hmiUsesControlHw, hmiDisabled, hmiRefNumber, licences } = req.body;
+  const { name, description, category, sourceType, items, SelectedHw, Hmi_id, hmiUsesControlHw, hmiDisabled, hmiRefNumber, licences, importedSections, importedRuntimeIoPoints } = req.body;
   if (!name || !category) {
     return res.status(400).json({ message: 'name and category are required' });
   }
@@ -109,6 +132,8 @@ router.post('/', requireAuth, requireAdmin, upload.single('image'), async (req, 
     hmiDisabled: hmiDisabled === 'true',
     hmiRefNumber: hmiRefNumber || null,
     licences: licences ? JSON.parse(licences) : undefined,
+    importedSections: importedSections ? JSON.parse(importedSections) : undefined,
+    importedRuntimeIoPoints: Number(importedRuntimeIoPoints) || 0,
     createdBy: req.user?._id ?? null,
   });
 
@@ -117,7 +142,7 @@ router.post('/', requireAuth, requireAdmin, upload.single('image'), async (req, 
 
 // PUT /templates/:id — admin only
 router.put('/:id', requireAuth, requireAdmin, upload.single('image'), async (req, res) => {
-  const { name, description, category, sourceType, items, SelectedHw, Hmi_id, hmiUsesControlHw, hmiDisabled, hmiRefNumber, licences } = req.body;
+  const { name, description, category, sourceType, items, SelectedHw, Hmi_id, hmiUsesControlHw, hmiDisabled, hmiRefNumber, licences, importedSections, importedRuntimeIoPoints } = req.body;
   if (!name || !category) {
     return res.status(400).json({ message: 'name and category are required' });
   }
@@ -134,6 +159,8 @@ router.put('/:id', requireAuth, requireAdmin, upload.single('image'), async (req
     hmiDisabled: hmiDisabled === 'true',
     hmiRefNumber: hmiRefNumber || null,
     licences: licences ? JSON.parse(licences) : undefined,
+    importedSections: importedSections ? JSON.parse(importedSections) : undefined,
+    importedRuntimeIoPoints: Number(importedRuntimeIoPoints) || 0,
   };
   if (req.file) {
     updates.imageUrl = `/uploads/templates/${req.file.filename}`;

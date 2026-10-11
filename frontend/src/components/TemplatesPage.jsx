@@ -6,6 +6,7 @@ import { authFetch } from '../api.js'
 import { useProjectDraft } from '../context/ProjectDraftContext.jsx'
 import { isHarmonyP6 } from '../lib/harmonyP6'
 import { buildRequiredLicenses } from '../lib/licensing'
+import { ImportedClassificationSections, ImportedRows, hasImportedSections } from './ImportedSections.jsx'
 
 const FILE_BASE = 'http://localhost:3000'
 const CATEGORIES = [
@@ -380,7 +381,7 @@ export default function TemplatesPage() {
                 <p className="text-sm text-red-600 mb-4">{useTemplateError}</p>
               )}
 
-              {previewTemplate.sourceType === 'manual' && (
+              {previewTemplate.sourceType === 'manual' && !previewTemplate.importedSections && (
                 <section className="mb-6">
                   <div className="flex items-center gap-2 mb-3">
                     <FileText className="w-4 h-4 text-green-600" />
@@ -409,16 +410,31 @@ export default function TemplatesPage() {
                 </section>
               )}
 
-              {/* Hardware */}
-              <section className="mb-6">
+              {hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && (
+                <ImportedClassificationSections
+                  sections={previewTemplate.importedSections}
+                  runtimeIoPoints={previewTemplate.importedRuntimeIoPoints}
+                />
+              )}
+
+              {!hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && <section className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
                   <Cpu className="w-4 h-4 text-green-600" />
                   <h4 className="text-sm font-semibold text-gray-900">Hardware</h4>
                 </div>
-                {previewHwEntries.length === 0 ? (
+                {previewHwEntries.length === 0 && !hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) ? (
                   <p className="text-sm text-gray-500">No hardware selected.</p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && (
+                      <div className="sm:col-span-2">
+                        <ImportedRows items={[
+                          ...(previewTemplate.importedSections?.hardware || []),
+                          ...(previewTemplate.importedSections?.io || []),
+                          ...(previewTemplate.importedSections?.switches || []),
+                        ]} />
+                      </div>
+                    )}
                     {previewHwEntries.map(([key, { hwId, refNumber, ioRefNumber, count, attachments }]) => {
                       const hw = hardwareCatalog.find((h) => h._id === hwId)
                       return (
@@ -448,10 +464,10 @@ export default function TemplatesPage() {
                     })}
                   </div>
                 )}
-              </section>
+              </section>}
 
               {/* HMI */}
-              <section className="mb-6">
+              {!hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && <section className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
                   <Monitor className="w-4 h-4 text-green-600" />
                   <h4 className="text-sm font-semibold text-gray-900">HMI</h4>
@@ -462,7 +478,9 @@ export default function TemplatesPage() {
                     <p className="text-sm text-gray-900">Uses Control/IO hardware (Harmony P6)</p>
                   </div>
                 ) : previewTemplate.hmiDisabled ? (
-                  <p className="text-sm text-gray-500">No HMI</p>
+                  previewTemplate.importedSections?.hmi?.length
+                    ? <ImportedRows items={previewTemplate.importedSections.hmi} />
+                    : <p className="text-sm text-gray-500">No HMI</p>
                 ) : previewActiveHmi ? (
                   <div className="rounded-xl border border-gray-200 p-3 inline-flex items-center gap-3">
                     {previewActiveHmi.image && (
@@ -479,10 +497,10 @@ export default function TemplatesPage() {
                 ) : (
                   <p className="text-sm text-gray-500">No HMI selected.</p>
                 )}
-              </section>
+              </section>}
 
               {/* Licences */}
-              <section className="mb-6">
+              {!hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && <section className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
                   <ShieldCheck className="w-4 h-4 text-green-600" />
                   <h4 className="text-sm font-semibold text-gray-900">Licences</h4>
@@ -517,7 +535,12 @@ export default function TemplatesPage() {
                     </p>
                   </div>
                 </div>
-              </section>
+                {previewTemplate.importedSections?.licences?.length > 0 && (
+                  <div className="mt-3">
+                    <ImportedRows items={previewTemplate.importedSections.licences} />
+                  </div>
+                )}
+              </section>}
 
               {/* Required Licenses */}
               <section className="mb-6">

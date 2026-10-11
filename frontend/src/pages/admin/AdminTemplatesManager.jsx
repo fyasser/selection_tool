@@ -7,6 +7,7 @@ import { authFetch } from '../../api.js'
 import { useProjectDraft } from '../../context/ProjectDraftContext.jsx'
 import { isHarmonyP6 } from '../../lib/harmonyP6'
 import { buildRequiredLicenses } from '../../lib/licensing'
+import { ImportedClassificationSections, ImportedRows, hasImportedSections } from '../../components/ImportedSections.jsx'
 
 const FILE_BASE = 'http://localhost:3000'
 const CATEGORIES = [
@@ -137,7 +138,14 @@ export default function AdminTemplatesManager() {
         }
       })
       if (sheets.length === 0) throw new Error('The workbook does not contain any worksheets.')
-      setImportSheets(sheets)
+      const previewRes = await authFetch('http://localhost:3000/templates/import/preview', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sheets }),
+      })
+      const previewBody = await previewRes.json().catch(() => ({}))
+      if (!previewRes.ok) throw new Error(previewBody.message || 'Could not classify the workbook.')
+      setImportSheets(previewBody)
     } catch (err) {
       console.error(err)
       setImportError(err.message || 'Could not read the Excel workbook.')
@@ -212,6 +220,8 @@ export default function AdminTemplatesManager() {
       formData.append('hmiDisabled', String(Boolean(previewTemplate.hmiDisabled)))
       formData.append('hmiRefNumber', previewDraft.hmiRefNumber ?? previewTemplate.hmiRefNumber ?? '')
       formData.append('licences', JSON.stringify(previewTemplate.licences || {}))
+      formData.append('importedSections', JSON.stringify(previewTemplate.importedSections || {}))
+      formData.append('importedRuntimeIoPoints', String(previewTemplate.importedRuntimeIoPoints || 0))
 
       const res = await authFetch(`http://localhost:3000/templates/${previewTemplate._id}`, {
         method: 'PUT',
@@ -487,7 +497,7 @@ export default function AdminTemplatesManager() {
               )}
               {previewSaveError && <p className="text-sm text-red-600 mb-4">{previewSaveError}</p>}
 
-              {previewTemplate.sourceType === 'manual' && (
+              {previewTemplate.sourceType === 'manual' && !previewTemplate.importedSections && (
                 <section className="mb-6">
                   <div className="flex items-center justify-between gap-3 mb-3">
                     <h4 className="text-sm font-semibold text-gray-900">Template Items</h4>
@@ -524,10 +534,26 @@ export default function AdminTemplatesManager() {
                 </section>
               )}
 
-              <section className="mb-6">
+              {hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && (
+                <ImportedClassificationSections
+                  sections={previewTemplate.importedSections}
+                  runtimeIoPoints={previewTemplate.importedRuntimeIoPoints}
+                />
+              )}
+
+              {!hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && <section className="mb-6">
                 <div className="flex items-center gap-2 mb-3"><Cpu className="w-4 h-4 text-green-600" /><h4 className="text-sm font-semibold text-gray-900">Hardware</h4></div>
-                {previewHwEntries.length === 0 ? <p className="text-sm text-gray-500">No hardware selected.</p> : (
+                {previewHwEntries.length === 0 && !hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) ? <p className="text-sm text-gray-500">No hardware selected.</p> : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && (
+                      <div className="sm:col-span-2">
+                        <ImportedRows items={[
+                          ...(previewTemplate.importedSections?.hardware || []),
+                          ...(previewTemplate.importedSections?.io || []),
+                          ...(previewTemplate.importedSections?.switches || []),
+                        ]} />
+                      </div>
+                    )}
                     {previewHwEntries.map(([key, { hwId, refNumber, ioRefNumber, count, attachments }]) => {
                       const hw = hardwareCatalog.find((item) => item._id === hwId)
                       return (
@@ -571,9 +597,9 @@ export default function AdminTemplatesManager() {
                     })}
                   </div>
                 )}
-              </section>
+              </section>}
 
-              <section className="mb-6">
+              {!hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && <section className="mb-6">
                 <div className="flex items-center gap-2 mb-3"><Monitor className="w-4 h-4 text-green-600" /><h4 className="text-sm font-semibold text-gray-900">HMI</h4></div>
                 {previewTemplate.hmiUsesControlHw ? (
                   <div className="rounded-xl border border-green-200 bg-green-50 p-3 inline-flex items-center gap-3">
@@ -590,7 +616,11 @@ export default function AdminTemplatesManager() {
                       )}
                     </div>
                   </div>
-                ) : previewTemplate.hmiDisabled ? <p className="text-sm text-gray-500">No HMI</p> : previewActiveHmi ? (
+                ) : previewTemplate.hmiDisabled ? (
+                  previewTemplate.importedSections?.hmi?.length
+                    ? <ImportedRows items={previewTemplate.importedSections.hmi} />
+                    : <p className="text-sm text-gray-500">No HMI</p>
+                ) : previewActiveHmi ? (
                   <div className="rounded-xl border border-gray-200 p-3 inline-flex items-center gap-3">
                     {previewActiveHmi.image && <img src={previewActiveHmi.image} alt={previewActiveHmi.Name} className="w-12 h-12 object-contain" />}
                     <div>
@@ -607,17 +637,22 @@ export default function AdminTemplatesManager() {
                     </div>
                   </div>
                 ) : <p className="text-sm text-gray-500">No HMI selected.</p>}
-              </section>
+              </section>}
 
-              <section className="mb-6">
+              {!hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && <section className="mb-6">
                 <div className="flex items-center gap-2 mb-3"><ShieldCheck className="w-4 h-4 text-green-600" /><h4 className="text-sm font-semibold text-gray-900">Licences</h4></div>
                 <div className="rounded-xl border border-gray-200 p-3 grid grid-cols-1 sm:grid-cols-2 gap-y-2 gap-x-6 text-sm">
                   <div><p className="text-gray-500 text-xs mb-0.5">Build Time</p><p className="text-gray-900 font-medium">{previewTemplate.licences?.buildTime?.wanted ? `${previewTemplate.licences.buildTime.tier}${previewTemplate.licences.buildTime.addons?.length > 0 ? ` (${previewTemplate.licences.buildTime.addons.join(', ')})` : ''}` : 'Not needed'}</p></div>
-                  <div><p className="text-gray-500 text-xs mb-0.5">Runtime IO Points</p><p className="text-gray-900 font-medium">{previewTotalIoPoints || '—'}</p></div>
+                  <div><p className="text-gray-500 text-xs mb-0.5">Runtime IO Points</p><p className="text-gray-900 font-medium">{previewTotalIoPoints || previewTemplate.importedRuntimeIoPoints || '—'}</p></div>
                   <div><p className="text-gray-500 text-xs mb-0.5">Orchestration Nodes</p><p className="text-gray-900 font-medium">{previewTemplate.licences?.orchestration?.nodeCount || '—'}</p></div>
                   <div><p className="text-gray-500 text-xs mb-0.5">Communication Protocols</p><p className="text-gray-900 font-medium">{previewTemplate.licences?.communication?.protocols?.length > 0 ? previewTemplate.licences.communication.protocols.join(', ') : 'None'}</p></div>
                 </div>
-              </section>
+                {previewTemplate.importedSections?.licences?.length > 0 && (
+                  <div className="mt-3">
+                    <ImportedRows items={previewTemplate.importedSections.licences} />
+                  </div>
+                )}
+              </section>}
 
               <section className="mb-6">
                 <div className="flex items-center gap-2 mb-3"><FileText className="w-4 h-4 text-green-600" /><h4 className="text-sm font-semibold text-gray-900">Required Licenses</h4></div>
@@ -724,7 +759,10 @@ export default function AdminTemplatesManager() {
                   <div className="flex items-center justify-between gap-4">
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{sheet.name}</p>
-                      <p className="text-xs text-gray-500">{sheet.items.length} imported item{sheet.items.length === 1 ? '' : 's'}</p>
+                      <p className="text-xs text-gray-500">
+                        {sheet.items.length} imported item{sheet.items.length === 1 ? '' : 's'}
+                        {sheet.runtimeIoPoints > 0 && ` · ${sheet.runtimeIoPoints} runtime I/O points`}
+                      </p>
                     </div>
                     <select
                       value={sheet.category}
@@ -733,6 +771,15 @@ export default function AdminTemplatesManager() {
                     >
                       {CATEGORIES.map((category) => <option key={category.key} value={category.key}>{category.label}</option>)}
                     </select>
+                  </div>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {Object.entries(sheet.sections || {}).map(([section, items]) => items.length > 0 && (
+                      <span key={section} className={`rounded-full px-2.5 py-1 text-xs ${
+                        section === 'unclassified' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'
+                      }`}>
+                        {section}: {items.length}
+                      </span>
+                    ))}
                   </div>
                 </div>
               ))}

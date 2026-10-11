@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { ClipboardList, Users, Cpu, Monitor, ShieldCheck, LayoutTemplate } from "lucide-react";
+import { ClipboardList, Users, Cpu, Monitor, ShieldCheck, LayoutTemplate, FileCode2 } from "lucide-react";
 import AdminProjectsReview from "./AdminProjectsReview.jsx";
 import AdminUsers from "./AdminUsers.jsx";
 import AdminHardwareManager from "./AdminHardwareManager.jsx";
 import AdminHmiManager from "./AdminHmiManager.jsx";
 import AdminLicenseManager from "./AdminLicenseManager.jsx";
 import AdminTemplatesManager from "./AdminTemplatesManager.jsx";
+import AdminImportRules from "./AdminImportRules.jsx";
 
 const TABS = [
   { key: "projects", label: "Project Review", icon: ClipboardList },
@@ -14,6 +15,7 @@ const TABS = [
   { key: "hmi", label: "HMI", icon: Monitor },
   { key: "licenses", label: "Licenses", icon: ShieldCheck },
   { key: "templates", label: "Templates", icon: LayoutTemplate },
+  { key: "import-rules", label: "Import Rules", icon: FileCode2 },
 ];
 
 export default function AdminDashboard() {
@@ -53,6 +55,7 @@ export default function AdminDashboard() {
       {activeTab === "hmi" && <AdminHmiManager />}
       {activeTab === "licenses" && <AdminLicenseManager />}
       {activeTab === "templates" && <AdminTemplatesManager />}
+      {activeTab === "import-rules" && <AdminImportRules />}
     </div>
   );
 }

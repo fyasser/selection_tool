@@ -1,0 +1,63 @@
+{
+  "version": 1,
+  "rules": [
+    {
+      "id": "eal-control-pack-10-io",
+      "label": "EALPTXP / Control Pack 10 I/O Points",
+      "section": "licences",
+      "referencePrefixes": ["EALPTXP"],
+      "descriptionIncludes": ["control pack 10 i/o points"],
+      "runtimeIoPointsPerUnit": 10,
+      "priority": 100
+    },
+    {
+      "id": "bmx-x80-io",
+      "label": "BMX X80 I/O",
+      "section": "io",
+      "referencePrefixes": ["BMX"],
+      "priority": 90
+    },
+    {
+      "id": "tm3-io",
+      "label": "TM3 I/O",
+      "section": "io",
+      "referencePrefixes": ["TM3"],
+      "priority": 80
+    },
+    {
+      "id": "bme-controller",
+      "label": "BME controller hardware",
+      "section": "hardware",
+      "referencePrefixes": ["BME"],
+      "priority": 70
+    },
+    {
+      "id": "tm2-controller",
+      "label": "TM2 controller hardware",
+      "section": "hardware",
+      "referencePrefixes": ["TM2"],
+      "priority": 60
+    },
+    {
+      "id": "mcs-switch",
+      "label": "MCS switch",
+      "section": "switches",
+      "referencePrefixes": ["MCS"],
+      "priority": 50
+    },
+    {
+      "id": "eal-licence",
+      "label": "EAL licence",
+      "section": "licences",
+      "referencePrefixes": ["EAL"],
+      "priority": 40
+    },
+    {
+      "id": "hmi-reference",
+      "label": "HMI",
+      "section": "hmi",
+      "referencePrefixes": ["HMI"],
+      "priority": 30
+    }
+  ]
+}

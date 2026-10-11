@@ -47,6 +47,15 @@ const templateSchema = new mongoose.Schema(
         protocols: [{ type: String, enum: ['Profinet', 'IEC 61850', 'OPC UA as a client'] }],
       },
     },
+    importedSections: {
+      hardware: { type: [mongoose.Schema.Types.Mixed], default: [] },
+      io: { type: [mongoose.Schema.Types.Mixed], default: [] },
+      switches: { type: [mongoose.Schema.Types.Mixed], default: [] },
+      hmi: { type: [mongoose.Schema.Types.Mixed], default: [] },
+      licences: { type: [mongoose.Schema.Types.Mixed], default: [] },
+      unclassified: { type: [mongoose.Schema.Types.Mixed], default: [] },
+    },
+    importedRuntimeIoPoints: { type: Number, default: 0 },
 
     createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
   },

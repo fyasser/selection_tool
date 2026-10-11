@@ -98,6 +98,8 @@ if (isTemplate) {
     formData.append("hmiDisabled", String(projectDraft.hmiDisabled));
     if (projectDraft.hmiRefNumber) formData.append("hmiRefNumber", projectDraft.hmiRefNumber);
     formData.append("licences", JSON.stringify(projectDraft.licences));
+    formData.append("importedSections", JSON.stringify(projectDraft.importedSections || {}));
+    formData.append("importedRuntimeIoPoints", String(projectDraft.importedRuntimeIoPoints || 0));
     if (projectDraft.templateMeta.imageFile) {
         formData.append("image", projectDraft.templateMeta.imageFile);
     }
