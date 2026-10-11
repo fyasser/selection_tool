@@ -41,7 +41,7 @@ export default function HardwareCatalog() {
   return (
     <div className="max-w-5xl mx-auto p-8">
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Hardware Catalog</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Controller Catalog</h1>
         <p className="text-gray-600">
           Reference overview of available Control/IO hardware and their part numbers.
         </p>

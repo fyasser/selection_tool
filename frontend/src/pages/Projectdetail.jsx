@@ -246,15 +246,15 @@ async function handleDelete() {
       <section className="mb-10">
         <div className="flex items-center gap-2 mb-4">
           <Cpu className="w-5 h-5 text-green-600" />
-          <h2 className="text-lg font-semibold text-gray-900">Hardware</h2>
+          <h2 className="text-lg font-semibold text-gray-900">Controller</h2>
         </div>
         {Object.keys(hwGroups).length === 0 ? (
-          <p className="text-sm text-gray-500">No hardware selected.</p>
+          <p className="text-sm text-gray-500">No controller selected.</p>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {Object.values(hwGroups).map(({ hw, refNumber, ioRefNumber, count, ioPoints, attachments }, i) => (
               <div key={i} className="rounded-xl border border-gray-200 p-4">
-                <p className="font-medium text-gray-900">{hw?.Name || "Unknown hardware"}</p>
+                <p className="font-medium text-gray-900">{hw?.Name || "Unknown controller"}</p>
 
                 {refNumber && (
                   <p className="text-xs font-mono text-green-700 mt-1">Ref: {refNumber}</p>
@@ -301,7 +301,7 @@ async function handleDelete() {
               <Check className="w-4 h-4 text-green-700" />
             </div>
             <div>
-              <p className="font-medium text-gray-900">Same as Control/IO hardware</p>
+              <p className="font-medium text-gray-900">Same as Control/IO controller</p>
               <p className="text-sm text-gray-600">Harmony P6 hosts both Control and HMI</p>
               {consolidatedHwRef && (
                 <p className="text-xs font-mono text-green-700 mt-1">Ref: {consolidatedHwRef}</p>

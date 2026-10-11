@@ -109,19 +109,19 @@ function buildHardwareSection(project) {
 
   if (groups.length === 0) {
     paragraphs.push(
-      "No control hardware has been selected for this project yet."
+      "No control controller has been selected for this project yet."
     );
-    return { heading: "Control Architecture & Hardware", paragraphs };
+    return { heading: "Control Architecture & Controller", paragraphs };
   }
 
   paragraphs.push(
-    `The architecture is built around ${groups.length} hardware selection${
+    `The architecture is built around ${groups.length} controller selection${
       groups.length === 1 ? "" : "s"
     }, detailed below.`
   );
 
   const rows = groups.map((g, idx) => {
-    const hwName = resolveName(g.hw, `Hardware item ${idx + 1}`);
+    const hwName = resolveName(g.hw, `Controller item ${idx + 1}`);
     const ioNames = [...new Set(g.ioIds.map(resolveNameIfPopulated).filter(Boolean))];
     return {
       hwName,
@@ -134,7 +134,7 @@ function buildHardwareSection(project) {
     };
   });
 
-  // Narrative summary sentence per hardware group.
+  // Narrative summary sentence per controller group.
   rows.forEach((row) => {
     let sentence = `${row.hwName} (quantity: ${row.quantity})`;
     if (row.ioPoints !== "—") sentence += ` is sized for ${row.ioPoints} I/O points in total`;
@@ -142,7 +142,7 @@ function buildHardwareSection(project) {
       sentence += ` and communicates with ${joinList(row.ioNames)}`;
     }
     const refs = [];
-    if (row.refNumber !== "—") refs.push(`hardware reference ${row.refNumber}`);
+    if (row.refNumber !== "—") refs.push(`controller reference ${row.refNumber}`);
     if (row.ioRefNumber !== "—") refs.push(`I/O reference ${row.ioRefNumber}`);
     if (refs.length) sentence += `. Recorded under ${joinList(refs)}`;
     if (row.attachmentCount > 0) {
@@ -153,7 +153,7 @@ function buildHardwareSection(project) {
   });
 
   const table = {
-    headers: ["Hardware", "Qty", "I/O Points", "Ref. Number", "IO Ref. Number", "Connected I/O"],
+    headers: ["Controller", "Qty", "I/O Points", "Ref. Number", "IO Ref. Number", "Connected I/O"],
     rows: rows.map((r) => [
       r.hwName,
       String(r.quantity),
@@ -164,7 +164,7 @@ function buildHardwareSection(project) {
     ]),
   };
 
-  return { heading: "Control Architecture & Hardware", paragraphs, table };
+  return { heading: "Control Architecture & Controller", paragraphs, table };
 }
 
 /**
@@ -186,12 +186,12 @@ function buildHmiSection(project) {
 
   if (project.hmiUsesControlHw) {
     paragraphs.push(
-      "Visualization is consolidated onto the control hardware: the HMI runtime shares " +
-        "the same CPU as the control application rather than running on separate hardware."
+      "Visualization is consolidated onto the control controller: the HMI runtime shares " +
+        "the same CPU as the control application rather than running on a separate controller."
     );
   } else if (hmiName) {
     paragraphs.push(
-      `Visualization is handled by ${hmiName}, running independently from the control hardware.`
+      `Visualization is handled by ${hmiName}, running independently from the control controller.`
     );
   }
 

@@ -129,7 +129,7 @@ It allows the control application to becomes independent from the underlying com
 
   return (
     <div className="max-w-5xl mx-auto p-8">
-      <h1 className="text-2xl font-bold text-gray-900 mb-6">Choose Hardware</h1>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Choose Controller</h1>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
 {hardwareOptions.filter((hw) => hw.type === category).map((hw) => {
   const entries = getEntries(hw._id);

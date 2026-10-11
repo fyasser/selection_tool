@@ -26,14 +26,14 @@
     },
     {
       "id": "bme-controller",
-      "label": "BME controller hardware",
+      "label": "BME controller",
       "section": "hardware",
       "referencePrefixes": ["BME"],
       "priority": 70
     },
     {
       "id": "tm2-controller",
-      "label": "TM2 controller hardware",
+      "label": "TM2 controller",
       "section": "hardware",
       "referencePrefixes": ["TM2"],
       "priority": 60

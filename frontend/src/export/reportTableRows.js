@@ -72,15 +72,15 @@ export function buildDetailRows(project) {
   };
 
   // ---- Hardware ----
-  startSection("Control Architecture & Hardware");
+  startSection("Control Architecture & Controller");
   const hwGroups = groupSelectedHw(project.SelectedHw || []);
   if (hwGroups.length === 0) {
-    rows.push(dataRow(nextItem(), { value: "No hardware selected yet." }));
+    rows.push(dataRow(nextItem(), { value: "No controller selected yet." }));
   } else {
     hwGroups.forEach((g, idx) => {
       rows.push(
         dataRow(nextItem(), {
-          value: resolveName(g.hw, `Hardware ${idx + 1}`),
+          value: resolveName(g.hw, `Controller ${idx + 1}`),
           quantity: g.quantity,
           refNumber: g.refNumber || EMPTY,
         })
@@ -96,7 +96,7 @@ export function buildDetailRows(project) {
       value: project.hmiDisabled
         ? "No HMI"
         : project.hmiUsesControlHw
-          ? "Same as Control/IO hardware"
+          ? "Same as Control/IO controller"
           : hmiName,
       quantity: project.hmiUsesControlHw || project.hmiDisabled ? 0 : 1,
       refNumber: project.hmiRefNumber || EMPTY,

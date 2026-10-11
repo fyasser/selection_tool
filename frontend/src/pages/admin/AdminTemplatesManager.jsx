@@ -2,12 +2,12 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import ExcelJS from 'exceljs'
-import { LayoutGrid, ShieldCheck, Plus, Pencil, Trash2, Wand2, ListChecks, Upload, X, Cpu, Monitor, FileText, Paperclip, Check, Search } from 'lucide-react'
+import { LayoutGrid, ShieldCheck, Plus, Pencil, Trash2, Wand2, ListChecks, Upload, X, Cpu, Monitor, Paperclip, Check, Search, FileCode2, ArrowLeft } from 'lucide-react'
 import { authFetch } from '../../api.js'
 import { useProjectDraft } from '../../context/ProjectDraftContext.jsx'
 import { isHarmonyP6 } from '../../lib/harmonyP6'
-import { buildRequiredLicenses } from '../../lib/licensing'
 import { ImportedClassificationSections, ImportedRows, hasImportedSections } from '../../components/ImportedSections.jsx'
+import AdminImportRules from './AdminImportRules.jsx'
 
 const FILE_BASE = 'http://localhost:3000'
 const CATEGORIES = [
@@ -38,6 +38,7 @@ export default function AdminTemplatesManager() {
   const [importError, setImportError] = useState(null)
   const [importSuccess, setImportSuccess] = useState(null)
   const [searchQuery, setSearchQuery] = useState('')
+  const [showImportRules, setShowImportRules] = useState(false)
 
   useEffect(() => {
     let active = true
@@ -296,22 +297,21 @@ export default function AdminTemplatesManager() {
     if (entry.attachmentUrl) previewHwGroups[key].attachments.push(entry.attachmentUrl)
   })
   const previewHwEntries = Object.entries(previewHwGroups)
-  const previewHardwareLicenseIds = previewHw
-    .map((entry) => hardwareCatalog.find((h) => h._id === entry.hw_id)?.license)
-    .filter(Boolean)
-  const previewRequiredLicenses = previewTemplate
-    ? buildRequiredLicenses({
-        buildTimeWanted: previewTemplate.licences?.buildTime?.wanted,
-        buildTimeTier: previewTemplate.licences?.buildTime?.tier,
-        buildTimeAddons: previewTemplate.licences?.buildTime?.addons ?? [],
-        totalIoPoints: previewTotalIoPoints,
-        orchestrationNodeCount: previewTemplate.licences?.orchestration?.nodeCount,
-        protocols: previewTemplate.licences?.communication?.protocols ?? [],
-        licenseCatalog,
-        hmiLicenseId: previewActiveHmi?.license,
-        hardwareLicenseIds: previewHardwareLicenseIds,
-      })
-    : []
+
+  if (showImportRules) {
+    return (
+      <div>
+        <button
+          onClick={() => setShowImportRules(false)}
+          className="mb-6 flex items-center gap-2 text-sm font-medium text-gray-600 hover:text-green-700"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          Back to Templates
+        </button>
+        <AdminImportRules />
+      </div>
+    )
+  }
 
   return (
     <div>
@@ -325,13 +325,22 @@ export default function AdminTemplatesManager() {
             className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm text-gray-900"
           />
         </div>
-        <button
-          onClick={() => setShowChoicePopup(true)}
-          className="flex items-center gap-2 rounded-lg bg-green-600 text-white px-4 py-2 text-sm font-medium hover:bg-green-700 whitespace-nowrap"
-        >
-          <Plus className="w-4 h-4" />
-          New Template
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowImportRules(true)}
+            className="flex items-center gap-2 rounded-lg border border-green-600 text-green-700 px-4 py-2 text-sm font-medium hover:bg-green-50 whitespace-nowrap"
+          >
+            <FileCode2 className="w-4 h-4" />
+            Rules for import from excel
+          </button>
+          <button
+            onClick={() => setShowChoicePopup(true)}
+            className="flex items-center gap-2 rounded-lg bg-green-600 text-white px-4 py-2 text-sm font-medium hover:bg-green-700 whitespace-nowrap"
+          >
+            <Plus className="w-4 h-4" />
+            New Template
+          </button>
+        </div>
       </div>
 
       {/* Category tabs */}
@@ -542,8 +551,8 @@ export default function AdminTemplatesManager() {
               )}
 
               {!hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && <section className="mb-6">
-                <div className="flex items-center gap-2 mb-3"><Cpu className="w-4 h-4 text-green-600" /><h4 className="text-sm font-semibold text-gray-900">Hardware</h4></div>
-                {previewHwEntries.length === 0 && !hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) ? <p className="text-sm text-gray-500">No hardware selected.</p> : (
+                <div className="flex items-center gap-2 mb-3"><Cpu className="w-4 h-4 text-green-600" /><h4 className="text-sm font-semibold text-gray-900">Controller</h4></div>
+                {previewHwEntries.length === 0 && !hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) ? <p className="text-sm text-gray-500">No controller selected.</p> : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && (
                       <div className="sm:col-span-2">
@@ -605,7 +614,7 @@ export default function AdminTemplatesManager() {
                   <div className="rounded-xl border border-green-200 bg-green-50 p-3 inline-flex items-center gap-3">
                     <Check className="w-4 h-4 text-green-700" />
                     <div>
-                      <p className="text-sm text-gray-900">Uses Control/IO hardware (Harmony P6)</p>
+                      <p className="text-sm text-gray-900">Uses Control/IO controller (Harmony P6)</p>
                       {isEditingPreview && previewTemplate.sourceType === 'wizard' && (
                         <input
                           value={previewDraft.hmiRefNumber}
@@ -654,11 +663,6 @@ export default function AdminTemplatesManager() {
                 )}
               </section>}
 
-              <section className="mb-6">
-                <div className="flex items-center gap-2 mb-3"><FileText className="w-4 h-4 text-green-600" /><h4 className="text-sm font-semibold text-gray-900">Required Licenses</h4></div>
-                {previewRequiredLicenses.length === 0 ? <p className="text-sm text-gray-500">No licences required.</p> : <div className="space-y-2">{previewRequiredLicenses.map(({ lic, quantity }) => <div key={lic._id} className="rounded-xl border border-gray-200 p-3"><div className="flex items-start justify-between gap-4"><p className="text-sm font-semibold text-gray-900">{lic.name}{quantity > 1 && <span className="text-xs font-semibold text-green-700 bg-green-50 rounded-full px-2 py-0.5 ml-2">× {quantity}</span>}</p><span className="text-xs font-mono text-green-700 bg-green-50 rounded-full px-2.5 py-1">{lic.reference_no}</span></div>{lic.description && <p className="text-xs text-gray-600">{lic.description}</p>}</div>)}</div>}
-              </section>
-
               <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
                 {isEditingPreview && (
                   <button
@@ -705,8 +709,8 @@ export default function AdminTemplatesManager() {
                 <div className="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center mb-3">
                   <Wand2 className="w-5 h-5 text-white" />
                 </div>
-                <p className="font-medium text-gray-900 mb-1">Hardware Wizard</p>
-                <p className="text-xs text-gray-600">Pick hardware, HMI, and licences from the catalog, step by step.</p>
+                <p className="font-medium text-gray-900 mb-1">Controller Wizard</p>
+                <p className="text-xs text-gray-600">Pick controllers, HMI, and licences from the catalog, step by step.</p>
               </button>
 
               <button

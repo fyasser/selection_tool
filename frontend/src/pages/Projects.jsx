@@ -139,7 +139,7 @@ useEffect(() => {
                 <div className="flex flex-wrap gap-2 mb-4">
                   <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-full px-2.5 py-1">
                     <Cpu className="w-3 h-3" />
-                    {hwCount} hardware
+                    {hwCount} controller{hwCount === 1 ? '' : 's'}
                   </span>
                   {project.Hmi_id?.Name && (
                     <span className="inline-flex items-center gap-1.5 text-xs font-medium text-gray-600 bg-gray-100 rounded-full px-2.5 py-1">

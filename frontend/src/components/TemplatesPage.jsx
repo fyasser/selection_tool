@@ -5,7 +5,6 @@ import { LayoutGrid, ShieldCheck, ArrowLeft, Plus, X, Cpu, Monitor, FileText, Pa
 import { authFetch } from '../api.js'
 import { useProjectDraft } from '../context/ProjectDraftContext.jsx'
 import { isHarmonyP6 } from '../lib/harmonyP6'
-import { buildRequiredLicenses } from '../lib/licensing'
 import { ImportedClassificationSections, ImportedRows, hasImportedSections } from './ImportedSections.jsx'
 
 const FILE_BASE = 'http://localhost:3000'
@@ -206,23 +205,6 @@ export default function TemplatesPage() {
   })
   const previewHwEntries = Object.entries(previewHwGroups)
 
-  const previewHardwareLicenseIds = previewHw
-    .map((entry) => hardwareCatalog.find((h) => h._id === entry.hw_id)?.license)
-    .filter(Boolean)
-
-  const previewRequiredLicenses = previewTemplate
-    ? buildRequiredLicenses({
-        buildTimeWanted: previewTemplate.licences?.buildTime?.wanted,
-        buildTimeTier: previewTemplate.licences?.buildTime?.tier,
-        buildTimeAddons: previewTemplate.licences?.buildTime?.addons ?? [],
-        totalIoPoints: previewTotalIoPoints,
-        orchestrationNodeCount: previewTemplate.licences?.orchestration?.nodeCount,
-        protocols: previewTemplate.licences?.communication?.protocols ?? [],
-        licenseCatalog,
-        hmiLicenseId: previewActiveHmi?.license,
-        hardwareLicenseIds: previewHardwareLicenseIds,
-      })
-    : []
 
   return (
     <div className="min-h-screen bg-white">
@@ -420,10 +402,10 @@ export default function TemplatesPage() {
               {!hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && <section className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
                   <Cpu className="w-4 h-4 text-green-600" />
-                  <h4 className="text-sm font-semibold text-gray-900">Hardware</h4>
+                  <h4 className="text-sm font-semibold text-gray-900">Controller</h4>
                 </div>
                 {previewHwEntries.length === 0 && !hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) ? (
-                  <p className="text-sm text-gray-500">No hardware selected.</p>
+                  <p className="text-sm text-gray-500">No controller selected.</p>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {hasImportedSections(previewTemplate.importedSections, previewTemplate.importedRuntimeIoPoints) && (
@@ -475,7 +457,7 @@ export default function TemplatesPage() {
                 {previewTemplate.hmiUsesControlHw ? (
                   <div className="rounded-xl border border-green-200 bg-green-50 p-3 inline-flex items-center gap-3">
                     <Check className="w-4 h-4 text-green-700 flex-shrink-0" />
-                    <p className="text-sm text-gray-900">Uses Control/IO hardware (Harmony P6)</p>
+                    <p className="text-sm text-gray-900">Uses Control/IO controller (Harmony P6)</p>
                   </div>
                 ) : previewTemplate.hmiDisabled ? (
                   previewTemplate.importedSections?.hmi?.length
@@ -541,38 +523,6 @@ export default function TemplatesPage() {
                   </div>
                 )}
               </section>}
-
-              {/* Required Licenses */}
-              <section className="mb-6">
-                <div className="flex items-center gap-2 mb-3">
-                  <FileText className="w-4 h-4 text-green-600" />
-                  <h4 className="text-sm font-semibold text-gray-900">Required Licenses</h4>
-                </div>
-                {previewRequiredLicenses.length === 0 ? (
-                  <p className="text-sm text-gray-500">No licences required.</p>
-                ) : (
-                  <div className="space-y-2">
-                    {previewRequiredLicenses.map(({ lic, quantity }) => (
-                      <div key={lic._id} className="rounded-xl border border-gray-200 p-3">
-                        <div className="flex items-start justify-between gap-4 mb-0.5">
-                          <p className="text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            {lic.name}
-                            {quantity > 1 && (
-                              <span className="text-xs font-semibold text-green-700 bg-green-50 rounded-full px-2 py-0.5">
-                                × {quantity}
-                              </span>
-                            )}
-                          </p>
-                          <span className="flex-shrink-0 text-xs font-mono text-green-700 bg-green-50 rounded-full px-2.5 py-1">
-                            {lic.reference_no}
-                          </span>
-                        </div>
-                        {lic.description && <p className="text-xs text-gray-600">{lic.description}</p>}
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </section>
 
               <div className="flex justify-end gap-3 pt-2 border-t border-gray-100">
                 <button

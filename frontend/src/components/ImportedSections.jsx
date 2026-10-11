@@ -1,5 +1,5 @@
 const LABELS = {
-  hardware: 'Hardware',
+  hardware: 'Controller',
   io: 'I/O',
   switches: 'Switches',
   hmi: 'HMI',
@@ -33,7 +33,7 @@ export function ImportedRows({ items = [] }) {
 
 export function ImportedClassificationSections({ sections = {}, runtimeIoPoints = 0 }) {
   const sectionLabels = [
-    ['hardware', 'Hardware'],
+    ['hardware', 'Controller'],
     ['io', 'I/O'],
     ['switches', 'Switches'],
     ['hmi', 'HMI'],

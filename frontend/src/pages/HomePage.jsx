@@ -181,7 +181,7 @@ const [showChoicePopup, setShowChoicePopup] = useState(false)
               <div className="w-12 h-12 rounded-lg bg-gray-900 flex items-center justify-center mb-6 group-hover:bg-gray-700 transition">
                 <Boxes className="w-6 h-6 text-white" />
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Hardware Catalog</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">Controller Catalog</h2>
               <p className="text-gray-600 text-sm">
                 Get to know all available Control and HMI hardware with their specs.
               </p>

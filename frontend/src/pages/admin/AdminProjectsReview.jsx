@@ -182,7 +182,7 @@ function ProjectReviewModal({ projectId, onClose, onReviewed }) {
               <section className="mb-6">
                 <div className="flex items-center gap-2 mb-3">
                   <Cpu className="w-4 h-4 text-green-600" />
-                  <h4 className="font-semibold text-gray-900 text-sm">Hardware</h4>
+                  <h4 className="font-semibold text-gray-900 text-sm">Controller</h4>
                 </div>
                 {(project.SelectedHw || []).length === 0 ? (
                   <p className="text-sm text-gray-500">None selected.</p>
@@ -205,7 +205,7 @@ function ProjectReviewModal({ projectId, onClose, onReviewed }) {
                   <h4 className="font-semibold text-gray-900 text-sm">HMI</h4>
                 </div>
                 {project.hmiUsesControlHw ? (
-                  <p className="text-sm text-gray-700">Same as Control/IO hardware (Harmony P6)</p>
+                  <p className="text-sm text-gray-700">Same as Control/IO controller (Harmony P6)</p>
                 ) : project.hmiDisabled ? (
                   <p className="text-sm text-gray-500">No HMI</p>
                 ) : project.Hmi_id ? (
@@ -255,7 +255,7 @@ function ProjectReviewModal({ projectId, onClose, onReviewed }) {
                     onChange={(e) => setComment(e.target.value)}
                     rows={3}
                     className="border border-gray-300 rounded-lg px-3 py-2 w-full mb-3"
-                    placeholder="e.g. IO point count looks too high for the selected hardware"
+                    placeholder="e.g. IO point count looks too high for the selected controller"
                   />
                   <div className="flex justify-end gap-3">
                     <button
