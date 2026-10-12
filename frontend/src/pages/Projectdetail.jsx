@@ -19,6 +19,7 @@ import { buildRequiredLicenses } from "../lib/licensing";
 import { useProjectDraft } from "../context/ProjectDraftContext.jsx";
 import StatusBadge from "../components/StatusBadge.jsx";
 import ExportReportButtons from "../components/Exportreportbutton.jsx";
+import { ImportedClassificationSections, hasImportedSections } from "../components/ImportedSections.jsx";
 import { projectFromDetail } from "../export/Reportadapters.js";
 import { authFetch } from "../api.js";
 
@@ -156,6 +157,11 @@ async function handleDelete() {
     ? (project.SelectedHw || []).find((entry) => isHarmonyP6(entry.hw_id))?.refNumber
     : null;
 
+  const hasImportedClassification = hasImportedSections(
+    project.importedSections,
+    project.importedRuntimeIoPoints
+  );
+
   // Group by hardware + reference number + IO reference number, since two
   // units of the same hardware can differ on any of those. Each group also
   // collects every uploaded attachment from its member units.
@@ -222,6 +228,13 @@ async function handleDelete() {
         <p className="text-gray-600 mb-4">{project.description}</p>
       )}
 
+      {hasImportedClassification && (
+        <ImportedClassificationSections
+          sections={project.importedSections}
+          runtimeIoPoints={project.importedRuntimeIoPoints}
+        />
+      )}
+
       <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-10 pb-6 border-b border-gray-200">
         <span className="inline-flex items-center gap-1.5">
           <Calendar className="w-4 h-4" />
@@ -243,7 +256,7 @@ async function handleDelete() {
       </div>
 
       {/* Hardware */}
-      <section className="mb-10">
+      {!hasImportedClassification && <section className="mb-10">
         <div className="flex items-center gap-2 mb-4">
           <Cpu className="w-5 h-5 text-green-600" />
           <h2 className="text-lg font-semibold text-gray-900">Controller</h2>
@@ -287,10 +300,10 @@ async function handleDelete() {
             ))}
           </div>
         )}
-      </section>
+      </section>}
 
       {/* HMI */}
-      <section className="mb-10">
+      {!hasImportedClassification && <section className="mb-10">
         <div className="flex items-center gap-2 mb-4">
           <Monitor className="w-5 h-5 text-green-600" />
           <h2 className="text-lg font-semibold text-gray-900">HMI</h2>
@@ -332,10 +345,10 @@ async function handleDelete() {
         ) : (
           <p className="text-sm text-gray-500">No HMI selected.</p>
         )}
-      </section>
+      </section>}
 
       {/* Licences */}
-      <section className="mb-10">
+      {!hasImportedClassification && <section className="mb-10">
         <div className="flex items-center gap-2 mb-4">
           <ShieldCheck className="w-5 h-5 text-green-600" />
           <h2 className="text-lg font-semibold text-gray-900">Licences</h2>
@@ -366,7 +379,7 @@ async function handleDelete() {
             </span>
           </p>
         </div>
-      </section>
+      </section>}
 
       {/* Required Licenses */}
       <section>

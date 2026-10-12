@@ -578,7 +578,7 @@ export default function AdminTemplatesManager() {
                                     ))
                                     return (
                                       <label className="grid gap-1 text-xs text-gray-600">
-                                        Hardware reference
+                                        Controller reference
                                         <input
                                           value={previewDraft.selectedHw[entryIndex]?.refNumber || ''}
                                           onChange={(event) => setPreviewDraft((draft) => ({
@@ -696,48 +696,53 @@ export default function AdminTemplatesManager() {
 
       {/* New Template choice popup */}
       {showChoicePopup && (
-        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-          <div className="bg-white rounded-2xl p-6 w-full max-w-md">
-            <h3 className="text-lg font-semibold text-gray-900 mb-2">New Template</h3>
-            <p className="text-sm text-gray-600 mb-6">How would you like to build it?</p>
+        <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-7 sm:p-8 w-full max-w-3xl shadow-xl">
+            <div className="mb-7">
+              <h3 className="text-xl font-semibold text-gray-900">Create a new template</h3>
+              <p className="text-sm text-gray-600 mt-1">Choose how you want to add the template items.</p>
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
               <button
                 onClick={startWizardTemplate}
-                className="p-5 rounded-xl border border-gray-200 hover:border-green-600 hover:shadow-md transition text-left"
+                className="group p-6 rounded-xl border border-gray-200 hover:border-green-600 hover:bg-green-50/40 hover:shadow-md transition text-left min-h-52 flex flex-col"
               >
-                <div className="w-10 h-10 rounded-lg bg-green-600 flex items-center justify-center mb-3">
+                <div className="w-11 h-11 rounded-xl bg-green-600 flex items-center justify-center mb-5 group-hover:scale-105 transition">
                   <Wand2 className="w-5 h-5 text-white" />
                 </div>
-                <p className="font-medium text-gray-900 mb-1">Controller Wizard</p>
-                <p className="text-xs text-gray-600">Pick controllers, HMI, and licences from the catalog, step by step.</p>
+                <p className="font-semibold text-gray-900 mb-2">Build from Catalog</p>
+                <p className="text-sm leading-5 text-gray-600">Choose controllers, HMI, and licences from the catalog with guided steps.</p>
+                <span className="mt-auto pt-5 text-xs font-medium text-green-700">Recommended for catalog items</span>
               </button>
 
               <button
                 onClick={startManualTemplate}
-                className="p-5 rounded-xl border border-gray-200 hover:border-green-600 hover:shadow-md transition text-left"
+                className="group p-6 rounded-xl border border-gray-200 hover:border-blue-600 hover:bg-blue-50/40 hover:shadow-md transition text-left min-h-52 flex flex-col"
               >
-                <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center mb-3">
+                <div className="w-11 h-11 rounded-xl bg-blue-600 flex items-center justify-center mb-5 group-hover:scale-105 transition">
                   <ListChecks className="w-5 h-5 text-white" />
                 </div>
-                <p className="font-medium text-gray-900 mb-1">Manual Entry</p>
-                <p className="text-xs text-gray-600">Type a reference, description, and quantity for each item.</p>
+                <p className="font-semibold text-gray-900 mb-2">Enter Items Manually</p>
+                <p className="text-sm leading-5 text-gray-600">Add each item yourself using its reference, description, and quantity.</p>
+                <span className="mt-auto pt-5 text-xs font-medium text-blue-700">Best for custom items</span>
               </button>
 
-              <label className="p-5 rounded-xl border border-gray-200 hover:border-green-600 hover:shadow-md transition text-left cursor-pointer">
-                <div className="w-10 h-10 rounded-lg bg-purple-600 flex items-center justify-center mb-3">
+              <label className="group p-6 rounded-xl border border-gray-200 hover:border-purple-600 hover:bg-purple-50/40 hover:shadow-md transition text-left cursor-pointer min-h-52 flex flex-col">
+                <div className="w-11 h-11 rounded-xl bg-purple-600 flex items-center justify-center mb-5 group-hover:scale-105 transition">
                   <Upload className="w-5 h-5 text-white" />
                 </div>
-                <p className="font-medium text-gray-900 mb-1">Import from Excel</p>
-                <p className="text-xs text-gray-600">Create one manual template per worksheet.</p>
+                <p className="font-semibold text-gray-900 mb-2">Import an Excel File</p>
+                <p className="text-sm leading-5 text-gray-600">Create templates from one or more worksheets in an Excel file.</p>
+                <span className="mt-auto pt-5 text-xs font-medium text-purple-700">Best for existing spreadsheets</span>
                 <input type="file" accept=".xlsx,.xls" onChange={readExcelFile} className="hidden" />
               </label>
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex justify-end mt-7 pt-5 border-t border-gray-100">
               <button
                 onClick={() => setShowChoicePopup(false)}
-                className="text-sm text-gray-600 hover:underline"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-gray-600 hover:bg-gray-100 hover:text-gray-900"
               >
                 Cancel
               </button>

@@ -3,7 +3,7 @@ import { FileCode2, Plus, Save, Trash2 } from 'lucide-react'
 import { authFetch } from '../../api.js'
 
 const SECTION_OPTIONS = [
-  { value: 'hardware', label: 'Hardware' },
+  { value: 'hardware', label: 'Controller' },
   { value: 'io', label: 'I/O' },
   { value: 'switches', label: 'Switches' },
   { value: 'hmi', label: 'HMI' },

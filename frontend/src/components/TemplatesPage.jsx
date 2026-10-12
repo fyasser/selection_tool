@@ -118,6 +118,8 @@ export default function TemplatesPage() {
           hmiUsesControlHw: template.hmiUsesControlHw ?? false,
           hmiDisabled: template.hmiDisabled ?? false,
           hmiRefNumber: template.hmiRefNumber ?? null,
+          importedSections: template.importedSections ?? null,
+          importedRuntimeIoPoints: template.importedRuntimeIoPoints ?? 0,
           licences: template.licences ?? {
             buildTime: { wanted: null, tier: null, addons: [] },
             runtime: { ioPoints: null },

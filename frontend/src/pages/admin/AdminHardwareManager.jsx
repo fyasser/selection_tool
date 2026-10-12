@@ -139,7 +139,7 @@ export default function AdminHardwareManager() {
     <div>
       <div className="relative max-w-md mb-4">
         <Search className="absolute left-3 top-2.5 w-4 h-4 text-gray-400" />
-        <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search hardware..." className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm" />
+        <input value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search controllers..." className="w-full rounded-lg border border-gray-300 py-2 pl-9 pr-3 text-sm" />
       </div>
       <div className="flex justify-end mb-4">
         <button
@@ -147,7 +147,7 @@ export default function AdminHardwareManager() {
           className="inline-flex items-center gap-1.5 rounded-lg bg-green-600 text-white px-4 py-2 text-sm font-medium hover:bg-green-700"
         >
           <Plus className="w-4 h-4" />
-          Add Hardware
+          Add Controller
         </button>
       </div>
 
@@ -193,7 +193,7 @@ export default function AdminHardwareManager() {
           <div className="bg-white rounded-2xl w-full max-w-xl max-h-[85vh] overflow-y-auto">
             <div className="sticky top-0 bg-white border-b border-gray-100 p-6 flex items-center justify-between">
               <h3 className="text-lg font-semibold text-gray-900">
-                {editingId ? "Edit Hardware" : "Add Hardware"}
+                {editingId ? "Edit Controller" : "Add Controller"}
               </h3>
               <button onClick={() => setFormOpen(false)} className="text-gray-400 hover:text-gray-600">
                 <X className="w-5 h-5" />
@@ -347,7 +347,7 @@ export default function AdminHardwareManager() {
                 disabled={saving}
                 className="rounded-lg bg-green-600 text-white px-4 py-2 text-sm font-medium hover:bg-green-700 disabled:opacity-50"
               >
-                {saving ? "Saving..." : editingId ? "Save Changes" : "Create Hardware"}
+                {saving ? "Saving..." : editingId ? "Save Changes" : "Create Controller"}
               </button>
             </div>
           </div>
